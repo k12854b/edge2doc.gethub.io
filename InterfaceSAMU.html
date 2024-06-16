@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html style="font-size: 16px;" lang="fr"><head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <title>InterfaceSAMU</title>
+    <link rel="stylesheet" href="css/nicepage.css" media="screen">
+<link rel="stylesheet" href="css/InterfaceSAMU.css" media="screen">
+    <script class="u-script" type="text/javascript" src="js/jquery-1.9.1.min.js" defer=""></script>
+    <script class="u-script" type="text/javascript" src="js/nicepage.js" defer=""></script>
+    <meta name="generator" content="Nicepage 6.11.10, nicepage.com">
+    <link id="u-theme-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">
+    
+    
+    
+    <script type="application/ld+json">{
+		"@context": "http://schema.org",
+		"@type": "Organization",
+		"name": ""
+}</script>
+    <meta name="theme-color" content="#478ac9">
+    <meta property="og:title" content="InterfaceSAMU">
+    <meta property="og:type" content="website">
+  <meta data-intl-tel-input-cdn-path="intlTelInput/">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="css/leaflet.css">
+  <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+  <link rel="stylesheet" href="css/qgis2web.css">
+  <link rel="stylesheet" href="css/fontawesome-all.min.css">
+<!--Map definition-->
+  <script src="js/qgis2web_expressions.js"></script>
+  <script src="js/leaflet.js"></script>
+  <script src="js/L.Control.Layers.Tree.js"></script>
+  <script src="js/leaflet.rotatedMarker.js"></script>
+  <script src="js/leaflet.pattern.js"></script>
+  <script src="js/leaflet-hash.js"></script>
+  <script src="js/Autolinker.min.js"></script>
+  <script src="js/rbush.min.js"></script>
+  <script src="js/labelgun.min.js"></script>
+  <script src="js/labels.js"></script>
+  <script src="data/clip_roads_edge2_2.js"></script>
+  <script src="data/buildings_eg2_2D_1.js"></script>
+  <style>
+  #map {
+      width: 989px;
+      height: 627px;
+  }
+  </style>
+  </head>
+  <body data-path-to-root="./" data-include-products="false" class="u-body u-xl-mode" data-lang="fr"><header class="u-clearfix u-container-align-center u-grey-80 u-header u-header" id="sec-a88a"><div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
+        <a href="C:\Users\popyg\Desktop\cloud\Acceuil.html" class="u-align-center u-border-none u-btn u-btn-round u-button-style u-grey-70 u-hover-grey-75 u-radius-50 u-text-active-white u-btn-1">Homepage </a>
+      </div></header>
+    <section class="u-clearfix u-grey-10 u-section-1" id="sec-295f">
+      <div class="data-layout-selected u-clearfix u-expanded-width u-layout-wrap u-layout-wrap-1">
+        <div class="u-layout">
+          <div class="u-layout-row">
+            <div class="u-container-style u-grey-50 u-layout-cell u-size-40 u-layout-cell-1">
+              <div class="u-container-layout u-container-layout-1" id="map">
+                <!--script to load map-->
+                <script src="js/mapS.js"></script>
+              </div>
+            </div>
+            <div class="u-container-style u-grey-80 u-layout-cell u-size-20 u-layout-cell-2">
+              <div class="u-container-layout u-container-layout-2">
+                <img class="u-image u-image-contain u-image-default u-image-1" src="images/pngwing.com.png" alt="" data-image-width="2252" data-image-height="1894">
+                <a href="tel:+12345678910" class="u-align-center u-border-none u-btn u-btn-round u-button-style u-custom-color-1 u-hover-grey-75 u-radius-50 u-text-active-white u-btn-1">Disaster cleared </a>
+                <!--ADD SOCKET COMMUNICATION HERE-->
+                <div class="u-form u-form-1">
+                  <form action="https://forms.nicepagesrv.com/v2/form/process" class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form" style="padding: 10px;">
+                    <div class="u-form-group u-form-message">
+                      <textarea rows="4" cols="50" id="message-7003" name="messagerie" class="u-input u-input-rectangle, agent-rsv" required="required"></textarea>
+                    </div>
+                    <div class="u-form-group">
+                      <input id="agent-ipt-a3" type="text" placeholder="send your message..." id="email-7003" name="message" class="u-input u-input-rectangle" required="required">
+                    </div>
+                    <div class="u-align-left u-form-group u-form-submit">
+                      <button id="agent-btn-a3-to-a2" onclick="OnClickSendBtn(this)" class="u-border-none u-btn u-btn-round u-btn-submit u-button-style u-grey-70 u-radius u-btn-5">To Police</button>
+                    </div>
+                    <div class="u-form-send-message u-form-send-success">Votre message a été envoyé. </div>
+                    <div class="u-form-send-error u-form-send-message"> Impossible d'envoyer votre message </div>
+                  </form>
+                </div>
+                <button id="agent-btn-a3-to-a1" onclick="OnClickSendBtn(this)" class="u-border-none u-btn u-btn-round u-button-style u-grey-70 u-radius u-btn-6">To Civil </button>
+              </div>
+            </div>
+                <script src="js/websocketmain.js"></script>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    
+    
+    <section class="u-backlink u-clearfix u-grey-80">
+      <p class="u-text">
+      </p>
+    </section>
+  
+</body></html>
