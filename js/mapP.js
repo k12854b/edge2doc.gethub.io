@@ -360,3 +360,81 @@ var map = L.map('map', {
       'cloud':cloud
       }
       L.control.layers(baseMaps,overlayMaps).addTo(map);
+      var fDrawGroup= new L.FeatureGroup();
+          map.addLayer(fDrawGroup);
+          var drawControl = new L.Control.Draw(
+            {
+            draw: {
+                polyline: true,
+                polygon: false,
+                rectangle: false,
+                circle: false,
+                marker: false,
+                circlemarker: false
+            },
+            edit: {
+                    featureGroup: fDrawGroup,
+                    remove: false
+                  },
+          });
+          map.addControl(drawControl);
+
+            map.on("draw:created", function(e)
+            {
+              var type = e.layerType;
+              var layer= e.layer;
+              console.log(e)
+              fDrawGroup.addLayer(layer);
+              alert(JSON.stringify(e.layer.toGeoJSON()));
+            });
+     //edit colors
+     var ctlStyle;
+  
+     ctlStyle = L.control.styleEditor({position:'topleft'}).addTo(map);
+     function latLngToString(ll) {
+       return "["+ll.lat.toFixed(5)+","+ll.lng.toFixed(5)+"]";
+     }
+     // Fetch GeoJSON data from the server and add it to the map
+function loadGeoJsonData() {
+    fetch('http://localhost:2000/get-geojson')
+      .then(response => response.json())
+      .then(data => {
+        const geoJsonLayer = L.geoJson(data, {
+          onEachFeature: function(feature, layer) {
+            // Apply the style from the properties if the layer has a setStyle method
+            if (feature.properties && feature.properties.style && typeof layer.setStyle === 'function') {
+              layer.setStyle(feature.properties.style);
+            }
+  
+            // Bind popup or any other interaction here
+            if (feature.properties && feature.properties.popupContent) {
+              layer.bindPopup(feature.properties.popupContent);
+            }
+          }
+        }).addTo(map);
+  
+        // Fit the map bounds to the new GeoJSON layer
+        map.fitBounds(geoJsonLayer.getBounds());
+      })
+      .catch(error => console.error('Error loading GeoJSON data:', error));
+  }
+  loadGeoJsonData();
+  
+// Function to delete all GeoJSON data
+        function deleteAllGeoJson() {
+          fetch('http://localhost:2000/delete-geojson', {
+            method: 'DELETE'
+          })
+          .then(response => response.json())
+          .then(data => {
+            console.log('Success:', data);
+            // Optionally, remove all layers from the map
+            map.eachLayer((layer) => {
+              if (layer instanceof L.GeoJSON) {
+                map.removeLayer(layer);
+              }
+            });
+            // Reload GeoJSON data or handle UI updates
+          })
+          .catch(error => console.error('Error deleting GeoJSON data:', error));
+        }

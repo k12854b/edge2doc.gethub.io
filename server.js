@@ -1,98 +1,84 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Pool } = require('pg');
-const fs = require('fs');
-const options = {
-  key: fs.readFileSync('D:/MAP CIVIL_PROTECTION/js/server-key.pem'),
-  cert: fs.readFileSync('D:/MAP CIVIL_PROTECTION/js/server.pem')
-};
-let WSServer = require('ws').Server;
-let server = require('https').createServer(options);
-let express = require('express');
-let cllerid=0;
-let https_port=443;
-// Create web socket server on top of a regular http server
-let wss = new WSServer({
-  server: server
-});
-//let app = express();
-let bodyParser = require('body-parser');
-app.use(bodyParser.json());
-app.use(express.static(__dirname));
-// Let's create the regular HTTP request and response
-app.get('/', function(req, res) {
-  console.log('Get interface');
-  fs.createReadStream('./InterfaceCivilProtection').pipe(res);
-});
-wss.on('connection', function connection(ws) { 
-	
-	ws.on('message', function incoming(message) {
-		let msg=JSON.parse(message);
-		console.log("Message : "+msg.src+'>>'+msg.dst);
-		ws.send(message);
-	});
-	ws.on("close", () => { 
-		console.log('http/ws server closed' );
-	});
-});
-server.listen(https_port, function() {
-  console.log('http/ws server listening on ' +https_port);
-});
-// Also mount the app here
-server.on('request', app);
-
-const app = express();
-const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'Disaster',
-    password: '1234',
-    port: 5432
-});
-
-
-const port = process.env.PORT || 3000;
-
-app.use(bodyParser.json());
 const cors = require('cors');
-app.use(cors());
+const app = express();
+const port = 3000;
 
-await client.connect();
-
-app.post('', async (req, res) => {
-    const geojson = req.body;
-    const client = new Client({
+    const pool = new Pool({
       user: 'postgres',  
       host: 'localhost',
-      database: 'Disaster',  
+      database: 'edge1_CP', 
       password: '1234',  
       port: 5432,
   });
+  app.use(bodyParser.json());
+  // Enable CORS for all routes
+app.use(cors());
 
-  await client.connect();
+// Middleware to parse JSON bodies
+app.use(bodyParser.json());
 
-    try {
-        const query = `
-            'INSERT INTO Disaster (type, propreties, geom)
-            VALUES ($1, $2, ST_SetSRID(ST_GeomFromGeoJSON($3), 4326), $4)
-            RETURNING id';
-        `;
-        
-        const values = [
-            geojson.geometry.type,
-            JSON.stringify(geojson.properties),
-            JSON.stringify(geojson.geom)
-        ];
-        
-        const result = await pool.query(query, values);
-        res.status(200).json({ id: result.rows[0].id });
-    } catch (err) {
-        console.error('Error saving GeoJSON to database:', err);
-        res.status(500).json({ error: 'Failed to save GeoJSON' });
-        await client.end();
-    }
+// Endpoint to receive GeoJSON data
+app.post('/save-geojson', async (req, res) => {
+  const geoJsonData = req.body;
+
+  // Extract the necessary data from the GeoJSON object
+  const { type, properties, geometry } = geoJsonData;
+
+  // Insert the GeoJSON data into the database
+  try {
+    const query = `
+      INSERT INTO geojson_features (type, properties, geometry)
+      VALUES ($1, $2, ST_SetSRID(ST_GeomFromGeoJSON($3), 4326))
+      RETURNING id
+    `;
+    const values = [type, properties, JSON.stringify(geometry)];
+    const result = await pool.query(query, values);
+
+    res.json({ message: 'GeoJSON data received and stored successfully', id: result.rows[0].id });
+  } catch (error) {
+    console.error('Error inserting data into database:', error);
+    res.status(500).json({ error: 'Failed to store GeoJSON data' });
+  }
 });
- 
-app.listen(PORT, () => {
-    console.log(`Server is running on port http://localhost:${PORT}`);
+
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
+// Extend server.js to include this new endpoint
+
+app.get('/get-geojson', async (req, res) => {
+  try {
+    const query = 'SELECT id, type, properties, ST_AsGeoJSON(geometry) as geometry FROM geojson_features';
+    const result = await pool.query(query);
+
+    // Construct GeoJSON FeatureCollection
+    const features = result.rows.map(row => ({
+      type: 'Feature',
+      properties: row.properties,
+      geometry: JSON.parse(row.geometry)
+    }));
+
+    const geoJsonData = {
+      type: 'FeatureCollection',
+      features: features
+    };
+
+    res.json(geoJsonData);
+  } catch (error) {
+    console.error('Error fetching data from database:', error);
+    res.status(500).json({ error: 'Failed to fetch GeoJSON data' });
+  }
+});
+// Endpoint to delete all GeoJSON data
+app.delete('/delete-geojson', async (req, res) => {
+  try {
+    const query = 'DELETE FROM geojson_features';
+    await pool.query(query);
+    res.json({ message: 'All GeoJSON data deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting data from database:', error);
+    res.status(500).json({ error: 'Failed to delete GeoJSON data' });
+  }
 });
