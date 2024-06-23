@@ -21,8 +21,8 @@ function saveDrawnFeatures() {
     sendGeoJsonToServer(geoJsonData);
   });
 }
-//socket structure
-const socket = io('http://localhost:3000');
+//socket structure 
+const socket = io('http://localhost:2000');
 
 socket.on('connect', () => {
   console.log('Connected to server');

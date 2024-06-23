@@ -92,9 +92,7 @@ app.post('/save-geojson', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+
 // Extend server.js to include this new endpoint
 
 app.get('/get-geojson', async (req, res) => {
@@ -130,4 +128,8 @@ app.delete('/delete-geojson', async (req, res) => {
     console.error('Error deleting data from database:', error);
     res.status(500).json({ error: 'Failed to delete GeoJSON data' });
   }
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
 });
