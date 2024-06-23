@@ -3,16 +3,16 @@ const bodyParser = require('body-parser');
 const { Pool } = require('pg');
 const cors = require('cors');
 const app = express();
-const port = 3000;
+const port = 2000;
 
     const pool = new Pool({
       user: 'postgres',  
       host: 'localhost',
-      database: 'edge1_CP', 
+      database: 'edge2_PS', 
       password: '1234',  
       port: 5432,
   });
-  app.use(bodyParser.json());
+app.use(bodyParser.json());
   // Enable CORS for all routes
 app.use(cors());
 
