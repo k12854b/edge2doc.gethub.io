@@ -2,71 +2,22 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { Pool } = require('pg');
 const cors = require('cors');
-const http = require('http');
-const socketIo = require('socket.io');
-const socketIoClient = require('socket.io-client');
 const app = express();
-const port = 2000;
+const port = 3000;
 
     const pool = new Pool({
       user: 'postgres',  
       host: 'localhost',
-      database: 'edge2_PS', 
+      database: 'edge1_CP', 
       password: '1234',  
       port: 5432,
   });
-app.use(bodyParser.json());
+  app.use(bodyParser.json());
   // Enable CORS for all routes
 app.use(cors());
 
-const server = http.createServer(app);
-const io = socketIo(server);
-
-const otherServerUrl = 'http://localhost:3000'; // URL of the other server
-const clientSocket = socketIoClient(otherServerUrl);
-
-io.on('connection', (socket) => {
-  console.log('New client connected');
-
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
-  });
-
-  socket.on('send-geojson', async (geoJsonData) => {
-    try {
-      const { type, properties, geometry } = geoJsonData;
-      const query = `
-        INSERT INTO geojson_features (type, properties, geometry)
-        VALUES ($1, $2, ST_SetSRID(ST_GeomFromGeoJSON($3), 4326))
-        RETURNING id
-      `;
-      const values = [type, properties, JSON.stringify(geometry)];
-      const result = await pool.query(query, values);
-      io.emit('receive-geojson', geoJsonData);  // Emit to all connected clients
-      clientSocket.emit('send-geojson', geoJsonData);  // Send to the other server
-      console.log('GeoJSON data saved and broadcasted');
-    } catch (error) {
-      console.error('Error inserting data into database:', error);
-    }
-  });
-});
-
-clientSocket.on('receive-geojson', async (geoJsonData) => {
-  try {
-    const { type, properties, geometry } = geoJsonData;
-    const query = `
-      INSERT INTO geojson_features (type, properties, geometry)
-      VALUES ($1, $2, ST_SetSRID(ST_GeomFromGeoJSON($3), 4326))
-      RETURNING id
-    `;
-    const values = [type, properties, JSON.stringify(geometry)];
-    await pool.query(query, values);
-    io.emit('receive-geojson', geoJsonData);  // Emit to all connected clients
-    console.log('GeoJSON data received from other server and saved');
-  } catch (error) {
-    console.error('Error inserting data into database:', error);
-  }
-});
+// Middleware to parse JSON bodies
+app.use(bodyParser.json());
 
 // Endpoint to receive GeoJSON data
 app.post('/save-geojson', async (req, res) => {
@@ -77,11 +28,12 @@ app.post('/save-geojson', async (req, res) => {
 
   // Insert the GeoJSON data into the database
   try {
-    const query = `
-      INSERT INTO geojson_features (type, properties, geometry)
-      VALUES ($1, $2, ST_SetSRID(ST_GeomFromGeoJSON($3), 4326))
-      RETURNING id
-    `;
+    const query = 
+      `
+        INSERT INTO geojson_features (type, properties, geometry)
+        VALUES ($1, $2, ST_SetSRID(ST_GeomFromGeoJSON($3), 4326))
+        RETURNING id
+      `;
     const values = [type, properties, JSON.stringify(geometry)];
     const result = await pool.query(query, values);
 
@@ -129,7 +81,6 @@ app.delete('/delete-geojson', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete GeoJSON data' });
   }
 });
-
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

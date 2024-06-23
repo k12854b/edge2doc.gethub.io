@@ -21,20 +21,9 @@ function saveDrawnFeatures() {
     sendGeoJsonToServer(geoJsonData);
   });
 }
-//socket structure 
-const socket = io('http://localhost:2000');
-
-socket.on('connect', () => {
-  console.log('Connected to server');
-});
-
-socket.on('receive-geojson', (geoJsonData) => {
-  console.log('New GeoJSON data received', geoJsonData);
-  addGeoJsonToMap(geoJsonData);
-});
 
 function sendGeoJsonToServer(geoJsonData) {
-  fetch('http://localhost:2000/save-geojson', {
+  fetch('http://localhost:3000/save-geojson', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
